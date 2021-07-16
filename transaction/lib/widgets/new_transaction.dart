@@ -9,16 +9,43 @@ class NewTransaction extends StatefulWidget {
 
   final Function addTx;
 
-  NewTransaction(this.addTx);
+  NewTransaction(this.addTx) {
+    print('Constructor newTransaction Widget');
+  }
 
   @override
-  _NewTransactionState createState() => _NewTransactionState();
+  _NewTransactionState createState() {
+    print('create state newtransaction widget');
+    return _NewTransactionState();
+  }
 }
 
 class _NewTransactionState extends State<NewTransaction> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   late DateTime _selectedDate = DateTime.now();
+
+  _NewTransactionState() {
+    print('Constructor newTransaction State');
+  }
+
+  @override
+  void initState() {
+    print('intiState()');
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant NewTransaction oldWidget) {
+    print('didUpdateWidget()');
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    print('dispose()');
+    super.dispose();
+  }
 
   void _submitData() {
     if (_amountController.text.isEmpty) {
@@ -104,6 +131,22 @@ class _NewTransactionState extends State<NewTransaction> {
                       ),
                     ),
                     //AdaptiveFlatButton('Choose Date', _presentDatePicker),
+                    Platform.isIOS
+                        ? CupertinoButton(
+                            onPressed: _presentDatePicker,
+                            child: Text(
+                              'Choose Date',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : FlatButton(
+                            textColor: Theme.of(context).primaryColor,
+                            onPressed: _presentDatePicker,
+                            child: Text(
+                              'Choose Date',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          )
                   ],
                 ),
               ),

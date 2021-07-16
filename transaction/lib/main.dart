@@ -1,12 +1,10 @@
-import 'dart:io';
+//import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo/models/transaction.dart';
 import 'package:flutter_demo/widgets/chart.dart';
 import 'package:flutter_demo/widgets/new_transaction.dart';
 import 'package:flutter_demo/widgets/transaction_list.dart';
-//import 'package:intl/intl.dart';
-import 'package:flutter/services.dart';
 
 void main() {
   // WidgetsFlutterBinding.ensureInitialized();
@@ -56,10 +54,31 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final List<Transaction> _userTransactions = [];
-  bool _showChart = false;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+    print('initState');
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    //super.didChangeAppLifecycleState(state);
+    print(state.toString());
+    print('didChangeAppLifecycleState');
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+    print('dispose');
+  }
+
+  bool _showChart = false;
   List<Transaction> get _recentTransactions {
     return _userTransactions.where((tx) {
       return tx.date.isAfter(
@@ -103,9 +122,29 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-//widget
+  Widget _buildLandscapeContent() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text('Show Chart'),
+        Switch.adaptive(
+          activeColor: Theme.of(context).accentColor,
+          value: _showChart,
+          onChanged: (val) {
+            setState(() {
+              _showChart = val;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  //Widget _buildPortraitContent() {}
+
   @override
   Widget build(BuildContext context) {
+    print('build() MyHomePage');
     final mediaQuery = MediaQuery.of(context);
     final isLandscape = mediaQuery.orientation == Orientation.landscape;
     final appBar = AppBar(
@@ -133,22 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            if (isLandscape)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text('Show Chart'),
-                  Switch.adaptive(
-                    activeColor: Theme.of(context).accentColor,
-                    value: _showChart,
-                    onChanged: (val) {
-                      setState(() {
-                        _showChart = val;
-                      });
-                    },
-                  ),
-                ],
-              ),
+            if (isLandscape) _buildLandscapeContent(),
             if (!isLandscape)
               Container(
                 height: (mediaQuery.size.height -
